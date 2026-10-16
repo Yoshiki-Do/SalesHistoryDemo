@@ -17,7 +17,11 @@ namespace SalesHistoryDemo.Controllers
             _databaseManager = databaseManager;
         }
 
-        public IActionResult Index(string? startDate, string? endDate, string? customerName, string sortOrder = "date_desc")
+        public IActionResult Index(
+            string? startDate,
+            string? endDate,
+            string? customerName,
+            string sortOrder = "date_desc")
         {
             var hasStartDate = DateTime.TryParse(startDate, out var start);
             var hasEndDate = DateTime.TryParse(endDate, out var end);
@@ -29,19 +33,23 @@ namespace SalesHistoryDemo.Controllers
                     StartDate = start,
                     EndDate = end,
                     CustomerName = customerName ?? "",
-                    ErrorMessage = "Start date must be ealier than or equal to end date.",
+                    ErrorMessage = "Start date must be earlier than or equal to end date.",
                     Sales = Array.Empty<Sale>()
                 };
 
                 return View(errorViewModel);
             }
 
-            var sales = _databaseManager.GetSales(customerName, hasStartDate ? start : null, hasEndDate ? end : null, sortOrder);
+            var sales = _databaseManager.GetSales(
+                customerName,
+                hasStartDate ? start : null,
+                hasEndDate ? end : null,
+                sortOrder);
 
             var viewModel = new SalesHistoryViewModel
             {
-                StartDate = DateTime.TryParse(startDate, out var parsedStart) ? parsedStart : null,
-                EndDate = DateTime.TryParse(endDate, out var parsedEnd) ? parsedEnd : null,
+                StartDate = hasStartDate ? start : null,
+                EndDate = hasEndDate ? end : null,
                 CustomerName = customerName ?? "",
                 Sales = sales,
                 SortOrder = sortOrder

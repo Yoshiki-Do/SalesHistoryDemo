@@ -21,12 +21,12 @@ namespace SalesHistoryDemo.Data
                 connection.Open();
 
                 string sql = @"
-                    SELECT SLIP_NUMBER, SALE_DATE, CUSTOMER_NAME,AMOUNT
+                    SELECT SLIP_NUMBER, SALE_DATE, CUSTOMER_NAME, AMOUNT
                     FROM SALES
                     WHERE (:customerName IS NULL
-                    OR INSTR(UPPER(CUSTOMER_NAME), UPPER(:customerName)) > 0)
-                    AND (:startDate IS NULL OR SALE_DATE >= :startDate)
-                    AND (:endDate IS NULL OR SALE_DATE < :endDate)
+                        OR INSTR(UPPER(CUSTOMER_NAME), UPPER(:customerName)) > 0)
+                        AND (:startDate IS NULL OR SALE_DATE >= :startDate)
+                        AND (:endDate IS NULL OR SALE_DATE < :endDate)
                     ORDER BY
                         CASE WHEN :sortOrder = 'amount_desc' THEN AMOUNT END DESC,
                         CASE WHEN :sortOrder = 'date_desc' THEN SALE_DATE END DESC";
