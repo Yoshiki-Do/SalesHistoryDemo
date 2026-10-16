@@ -36,17 +36,9 @@ namespace SalesHistoryDemo.Controllers
                 return View(errorViewModel);
             }
 
-            var sales = _databaseManager.GetSales();
+            var sales = _databaseManager.GetSales(customerName);
 
             var filteredSales = sales.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(customerName))
-            {
-                customerName = customerName.Trim();
-
-                filteredSales = filteredSales.Where(s =>
-                s.CustomerName.Contains(customerName, StringComparison.OrdinalIgnoreCase));
-            }
 
             if (DateTime.TryParse(startDate, out start))
             {
