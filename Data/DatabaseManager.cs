@@ -12,7 +12,7 @@ namespace SalesHistoryDemo.Data
             _connectionString = connectionString;
         }
 
-        public List<Sale> GetSales(string? customerName)
+        public List<Sale> GetSales(string? customerName, DateTime? startDate, DateTime? endDate)
         {
             var sales = new List<Sale>();
 
@@ -25,15 +25,31 @@ namespace SalesHistoryDemo.Data
                     FROM SALES
                     WHERE (:customerName IS NULL
                     OR INSTR(UPPER(CUSTOMER_NAME), UPPER(:customerName)) > 0)
+                    AND (:startDate IS NULL OR SALE_DATE >= :startDate)
+                    AND (:endDate IS NULL OR SALE_DATE < :endDate)
                     ORDER BY SALE_DATE DESC";
 
                 using (var command = new OracleCommand(sql, connection))
                 {
+                    command.BindByName = true;
+
                     command.Parameters.Add(
                         "customerName", OracleDbType.Varchar2
                         ).Value = string.IsNullOrWhiteSpace(customerName)
                         ? DBNull.Value
                         : customerName.Trim();
+
+                    command.Parameters.Add(
+                        "startDate", OracleDbType.Date
+                        ).Value = startDate.HasValue
+                        ? startDate.Value.Date
+                        : DBNull.Value;
+
+                    command.Parameters.Add(
+                        "endDate", OracleDbType.Date
+                        ).Value = endDate.HasValue
+                        ? endDate.Value.Date.AddDays(1)
+                        : DBNull.Value;
 
                     using (var reader = command.ExecuteReader())
                     {

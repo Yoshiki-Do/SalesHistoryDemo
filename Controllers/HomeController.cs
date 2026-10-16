@@ -36,21 +36,9 @@ namespace SalesHistoryDemo.Controllers
                 return View(errorViewModel);
             }
 
-            var sales = _databaseManager.GetSales(customerName);
+            var sales = _databaseManager.GetSales(customerName, hasStartDate ? start : null, hasEndDate ? end : null);
 
             var filteredSales = sales.AsEnumerable();
-
-            if (DateTime.TryParse(startDate, out start))
-            {
-                filteredSales = filteredSales.Where(s =>
-                s.SaleDate >= start);
-            }
-
-            if (DateTime.TryParse(endDate, out end))
-            {
-                filteredSales = filteredSales.Where(s =>
-                s.SaleDate < end.AddDays(1));
-            }
 
             var viewModel = new SalesHistoryViewModel
             {
