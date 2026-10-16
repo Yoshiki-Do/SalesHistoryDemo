@@ -12,7 +12,7 @@ namespace SalesHistoryDemo.Data
             _connectionString = connectionString;
         }
 
-        public List<Sale> GetSales(string? customerName, DateTime? startDate, DateTime? endDate)
+        public List<Sale> GetSales(string? customerName, DateTime? startDate, DateTime? endDate, string sortOrder)
         {
             var sales = new List<Sale>();
 
@@ -27,7 +27,9 @@ namespace SalesHistoryDemo.Data
                     OR INSTR(UPPER(CUSTOMER_NAME), UPPER(:customerName)) > 0)
                     AND (:startDate IS NULL OR SALE_DATE >= :startDate)
                     AND (:endDate IS NULL OR SALE_DATE < :endDate)
-                    ORDER BY SALE_DATE DESC";
+                    ORDER BY
+                        CASE WHEN :sortOrder = 'amount_desc' THEN AMOUNT END DESC,
+                        CASE WHEN :sortOrder = 'date_desc' THEN SALE_DATE END DESC";
 
                 using (var command = new OracleCommand(sql, connection))
                 {
@@ -50,6 +52,10 @@ namespace SalesHistoryDemo.Data
                         ).Value = endDate.HasValue
                         ? endDate.Value.Date.AddDays(1)
                         : DBNull.Value;
+
+                    command.Parameters.Add(
+                        "sortOrder", OracleDbType.Varchar2
+                        ).Value = sortOrder;
 
                     using (var reader = command.ExecuteReader())
                     {

@@ -36,18 +36,14 @@ namespace SalesHistoryDemo.Controllers
                 return View(errorViewModel);
             }
 
-            var sales = _databaseManager.GetSales(customerName, hasStartDate ? start : null, hasEndDate ? end : null);
-
-            var filteredSales = sales.AsEnumerable();
+            var sales = _databaseManager.GetSales(customerName, hasStartDate ? start : null, hasEndDate ? end : null, sortOrder);
 
             var viewModel = new SalesHistoryViewModel
             {
                 StartDate = DateTime.TryParse(startDate, out var parsedStart) ? parsedStart : null,
                 EndDate = DateTime.TryParse(endDate, out var parsedEnd) ? parsedEnd : null,
                 CustomerName = customerName ?? "",
-
-                Sales = sortOrder == "amount_desc" ? filteredSales.OrderByDescending(s => s.Amount).ToArray() :
-                filteredSales.OrderByDescending(s => s.SaleDate).ToArray(),
+                Sales = sales,
                 SortOrder = sortOrder
             };
 
