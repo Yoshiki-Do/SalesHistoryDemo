@@ -11,5 +11,9 @@ namespace SalesHistoryDemo.Models
         public string SortOrder { get; set; } = "date_desc";
         public string ErrorMessage { get; set; } = "";
         public IEnumerable<Sale> Sales { get; set; } = new List<Sale>();
+
+        public int CurrentPage { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public int TotalRecords { get; set; }
     }
 }

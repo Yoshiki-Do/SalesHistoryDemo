@@ -72,7 +72,16 @@
 
     <h2>Search Result</h2>
 
-    <p>@Model.Sales.Count() @(Model.Sales.Count() == 1 ? "record" : "records") found.</p>
+    <p>
+        @Model.Sales.Count()
+        @(Model.Sales.Count() == 1 ? "record" : "records") found.
+    </p>
+
+    <p>
+        Page @Model.CurrentPage of
+        @Math.Max(1,(int)Math.Ceiling(
+        Model.TotalRecords / (double)Model.PageSize))
+    </p>
 
     <table class="table table-striped table-bordered">
         <thead>
@@ -106,4 +115,59 @@
             }
         </tbody>
     </table>
+
+    @{
+        var totalPages = Math.Max(1,
+        (int)Math.Ceiling(
+        Model.TotalRecords / (double)Model.PageSize));
+    }
+
+    <nav aria-label="Sales history pages">
+        <ul class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="pageg-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-startDate="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                       asp-route-endDate="@Model.EndDate?.ToString("yyyy-MM-dd")"
+                       asp-route-customerName="@Model.CustomerName"
+                       asp-route-sortOrder="@Model.SortOrder"
+                       asp-route-page="@(Model.CurrentPage - 1)">
+                        Previous
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-startDate="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                       asp-route-endDate="@Model.EndDate?.ToString("yyyy-MM-dd")"
+                       asp-route-customerName="@Model.CustomerName"
+                       asp-route-sortOrder="@Model.SortOrder"
+                       asp-route-page="@i">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (Model.CurrentPage < totalPages)
+            {
+                <li class="pageg-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-startDate="@Model.StartDate?.ToString("yyyy-MM-dd")"
+                       asp-route-endDate="@Model.EndDate?.ToString("yyyy-MM-dd")"
+                       asp-route-customerName="@Model.CustomerName"
+                       asp-route-sortOrder="@Model.SortOrder"
+                       asp-route-page="@(Model.CurrentPage + 1)">
+                        Next
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
 </div>

@@ -21,7 +21,8 @@ namespace SalesHistoryDemo.Controllers
             string? startDate,
             string? endDate,
             string? customerName,
-            string sortOrder = "date_desc")
+            string sortOrder = "date_desc",
+            int page = 1)
         {
             var hasStartDate = DateTime.TryParse(startDate, out var start);
             var hasEndDate = DateTime.TryParse(endDate, out var end);
@@ -29,6 +30,11 @@ namespace SalesHistoryDemo.Controllers
             if (sortOrder != "date_desc" && sortOrder != "amount_desc")
             {
                 sortOrder = "date_desc";
+            }
+
+            if (page < 1)
+            {
+                page = 1;
             }
 
             if (hasStartDate && hasEndDate && start > end)
@@ -47,11 +53,20 @@ namespace SalesHistoryDemo.Controllers
 
             try
             {
+                int pageSize = 10;
+
                 var sales = _databaseManager.GetSales(
-                customerName,
-                hasStartDate ? start : null,
-                hasEndDate ? end : null,
-                sortOrder);
+                    customerName,
+                    hasStartDate ? start : null,
+                    hasEndDate ? end : null,
+                    sortOrder,
+                    page,
+                    pageSize);
+
+                var totalRecords = _databaseManager.GetSalesCount(
+                    customerName,
+                    hasStartDate ? start : null,
+                    hasEndDate ? end : null);
 
                 var viewModel = new SalesHistoryViewModel
                 {
@@ -59,7 +74,10 @@ namespace SalesHistoryDemo.Controllers
                     EndDate = hasEndDate ? end : null,
                     CustomerName = customerName ?? "",
                     Sales = sales,
-                    SortOrder = sortOrder
+                    SortOrder = sortOrder,
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecords
                 };
 
                 return View(viewModel);
