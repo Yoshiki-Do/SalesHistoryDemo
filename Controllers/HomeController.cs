@@ -26,6 +26,11 @@ namespace SalesHistoryDemo.Controllers
             var hasStartDate = DateTime.TryParse(startDate, out var start);
             var hasEndDate = DateTime.TryParse(endDate, out var end);
 
+            if (sortOrder != "date_desc" && sortOrder != "amount_desc")
+            {
+                sortOrder = "date_desc";
+            }
+
             if (hasStartDate && hasEndDate && start > end)
             {
                 var errorViewModel = new SalesHistoryViewModel
