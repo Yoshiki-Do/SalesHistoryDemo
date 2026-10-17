@@ -40,22 +40,41 @@ namespace SalesHistoryDemo.Controllers
                 return View(errorViewModel);
             }
 
-            var sales = _databaseManager.GetSales(
+            try
+            {
+                var sales = _databaseManager.GetSales(
                 customerName,
                 hasStartDate ? start : null,
                 hasEndDate ? end : null,
                 sortOrder);
 
-            var viewModel = new SalesHistoryViewModel
-            {
-                StartDate = hasStartDate ? start : null,
-                EndDate = hasEndDate ? end : null,
-                CustomerName = customerName ?? "",
-                Sales = sales,
-                SortOrder = sortOrder
-            };
+                var viewModel = new SalesHistoryViewModel
+                {
+                    StartDate = hasStartDate ? start : null,
+                    EndDate = hasEndDate ? end : null,
+                    CustomerName = customerName ?? "",
+                    Sales = sales,
+                    SortOrder = sortOrder
+                };
 
-            return View(viewModel);
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving sales history.");
+
+                var errorViewModel = new SalesHistoryViewModel
+                {
+                    StartDate = hasStartDate ? start : null,
+                    EndDate = hasEndDate ? end : null,
+                    CustomerName = customerName ?? "",
+                    SortOrder = sortOrder,
+                    ErrorMessage = "An error occurred while retrieving sales history.",
+                    Sales = Array.Empty<Sale>()
+                };
+
+                return View(errorViewModel);
+            }
         }
 
         public IActionResult Privacy()
